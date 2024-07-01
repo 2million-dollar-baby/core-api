@@ -17,7 +17,8 @@ class KafkaConsumerService {
     @KafkaListener(topics = ["gemini-response"], groupId = "group_id")
     fun consume(key: String, message: Message) {
         val queue = messageQueues.computeIfAbsent(key) {
-            PriorityBlockingQueue(compareBy { it.sequenceNumber }) }
+            PriorityBlockingQueue(1000, compareBy<Message> { it.sequenceNumber })
+        }
         queue.add(message)
 
         listeners[key]?.let { sink ->
